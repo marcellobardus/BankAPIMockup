@@ -1,7 +1,5 @@
 package dao
 
-// Docs https://hackernoon.com/build-restful-api-in-go-and-mongodb-5e7f2ec4be94
-
 import (
 	"log"
 
@@ -45,9 +43,12 @@ func (dao *BankMockupDAO) Delete(account models.Account) error {
 	return err
 }
 
-func (dao *BankMockupDAO) UpdateByInsuranceID(account models.Account) error {
+// UpdateByInsuranceID updates an index by it's social security number or PESEL etc...
+func (dao *BankMockupDAO) UpdateByInsuranceID(id string, account models.Account) error {
 	err := db.C(AccountsCollection).Update(bson.M{"socialinsuranceid": id}, &account)
 	return err
+}
+
 // GetAllAccounts return a list of all existing accounts in the database
 func (dao *BankMockupDAO) GetAllAccounts() ([]models.Account, error) {
 	var accounts []models.Account

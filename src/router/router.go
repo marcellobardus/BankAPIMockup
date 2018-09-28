@@ -2,13 +2,15 @@ package router
 
 import (
 	"github.com/gorilla/mux"
-	"gopkg.in/mgo.v2"
+	"github.com/spaghettiCoderIT/BankAPIMockup/src/dao"
 )
 
-var session *mgo.Session
+var database dao.BankMockupDAO
 
 func GetRouter() *mux.Router {
 	router := mux.NewRouter()
+	database.Database = "bankmockupdb"
+	database.Server = "localhost"
 	router.HandleFunc("/createNewUser", createNewUser).Methods("POST")
 	return router
 }
