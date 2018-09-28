@@ -8,8 +8,7 @@ import (
 )
 
 func main() {
-	const a = 9
 	router := router.GetRouter()
-	fmt.Print("Listening on 3000")
+	fmt.Println("Listening on port 3000")
 	http.ListenAndServe(":3000", router)
 }

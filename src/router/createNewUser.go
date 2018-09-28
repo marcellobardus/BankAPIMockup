@@ -2,9 +2,10 @@ package router
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
 
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/mgo.v2"
@@ -23,7 +24,7 @@ type Wallet struct {
 }
 
 // Account is a representation of a person who own a wallet and it's personal data
-type Account struct {
+type account struct {
 	name    string
 	surname string
 	mail    string
@@ -37,64 +38,49 @@ type Account struct {
 }
 
 // RegistrationData this data is passed in the POST requets
-type RegistrationData struct {
-	name         string
-	surname      string
-	mail         string
-	passwordHash string
+type registrationData struct {
+	name         string `bson:"name" json:"name"`
+	surname      string `bson:"surname" json:"surname"`
+	mail         string `bson:"mail" json:"mail"`
+	passwordHash string `bson:"passwordHash" json:"passwordHash"`
 
 	// First bank Account Data
 
-	bankName    string
-	bankCountry string
-	currency    string
+	bankName    string `bson:"bankName" json:"bankName"`
+	bankCountry string `bson:"bankCountry" json:"bankCountry"`
+	currency    string `bson:"currency" json:"currency"`
 }
 
 func createNewUser(w http.ResponseWriter, req *http.Request) {
-
-	var registrationData RegistrationData
-
-	if req.Body == nil {
-		http.Error(w, "Please send a request body", 400)
+	defer req.Body.Close()
+	var registerBuffer registrationData
+	if err := json.NewDecoder(req.Body).Decode(&registerBuffer); err != nil {
+		http.Error(w, "Invalid request payload", 400)
 		return
 	}
 
-	decoder := json.NewDecoder(req.Body).Decode(&registrationData)
-	log.Println(req.Body)
-	log.Println(decoder)
+	params := mux.Vars(req)
+	_ = json.NewDecoder(req.Body).Decode(&registerBuffer)
 
-	if decoder != nil {
-		http.Error(w, decoder.Error(), 400)
+	if len(params) == 0 {
+		http.Error(w, "params are empty", 400)
 		return
 	}
-
-	fmt.Println(registrationData)
-
-	name := registrationData.name
-	surname := registrationData.surname
-	mail := registrationData.mail
-	passwordHash := registrationData.passwordHash
-
-	// Registration account data
-
-	bankName := registrationData.bankName
-	bankCountry := registrationData.bankCountry
-	currency := registrationData.currency
 
 	s := session.Copy()
 	defer s.Close()
 	c := s.DB("bank_mockup").C("accounts")
 
-	var newUser Account
+	var newUser account
 
-	newUser.name = name
-	newUser.surname = surname
-	newUser.mail = mail
-	newUser.loginID = generateLoginID(name, surname, mail, time.Now())
-	newUser.passwordHash = passwordHash
+	newUser.name = params["name"]
+	newUser.surname = params["surname"]
+	newUser.mail = params["mail"]
+	newUser.loginID = generateLoginID(params["name"], params["surname"], params["mail"], time.Now())
+	newUser.passwordHash = params["passwordHash"]
 	newUser.registrationTime = time.Now()
 	newUser.wallets = make([]Wallet, 0)
-	newUser.wallets = append(newUser.wallets, generateWallet(currency, bankName, bankCountry))
+	newUser.wallets = append(newUser.wallets, generateWallet(params["currency"], params["bankName"], params["bankCountry"]))
 
 	dbErr := c.Insert(&newUser)
 	if dbErr != nil {
