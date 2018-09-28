@@ -9,7 +9,7 @@ type Account struct {
 	Mail    string `bson:"mail" json:"mail"`
 
 	LoginID           uint32 `bson:"loginid" json:"loginid"`
-	SocialInsuranceID uint32 `bson:"socialinsuranceid" json:"socialinsuranceid"`
+	SocialInsuranceID string `bson:"socialinsuranceid" json:"socialinsuranceid"`
 	PasswordHash      string `bson:"passwordhash" json:"passwordhash"`
 
 	RegistrationDate time.Time `bson:"registrationdate" json:"registrationdate"`
