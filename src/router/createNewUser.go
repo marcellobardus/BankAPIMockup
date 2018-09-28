@@ -2,6 +2,7 @@ package router
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -12,7 +13,7 @@ import (
 	"time"
 )
 
-// Wallet represent a bank account not assigned to anyone, it's created to let move wallets between people
+// Wallet represent a bank account not assigned to anyone, it's created to let move wallets between customers
 type Wallet struct {
 	currency    string
 	bankName    string
@@ -51,13 +52,23 @@ type RegistrationData struct {
 
 func createNewUser(w http.ResponseWriter, req *http.Request) {
 
-	decoder := json.NewDecoder(req.Body)
-
 	var registrationData RegistrationData
-	decoderErr := decoder.Decode(&registrationData)
-	if decoderErr != nil {
-		panic(decoderErr)
+
+	if req.Body == nil {
+		http.Error(w, "Please send a request body", 400)
+		return
 	}
+
+	decoder := json.NewDecoder(req.Body).Decode(&registrationData)
+	log.Println(req.Body)
+	log.Println(decoder)
+
+	if decoder != nil {
+		http.Error(w, decoder.Error(), 400)
+		return
+	}
+
+	fmt.Println(registrationData)
 
 	name := registrationData.name
 	surname := registrationData.surname
@@ -92,9 +103,10 @@ func createNewUser(w http.ResponseWriter, req *http.Request) {
 			return
 		}
 	}
+
 }
 
-func InsertIntoDatabase() {
+func insertIntoDatabase() {
 
 }
 
