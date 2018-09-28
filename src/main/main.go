@@ -10,6 +10,6 @@ import (
 func main() {
 	const a = 9
 	router := router.GetRouter()
-	http.Handle("/", router)
-	fmt.Print(a)
+	fmt.Print("Listening on 3000")
+	http.ListenAndServe(":3000", router)
 }

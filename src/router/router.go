@@ -7,8 +7,8 @@ import (
 
 var session *mgo.Session
 
-func GetRouter() mux.Router {
+func GetRouter() *mux.Router {
 	router := mux.NewRouter()
 	router.HandleFunc("/createNewUser", createNewUser).Methods("POST")
-	return *router
+	return router
 }
