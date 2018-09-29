@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/spaghettiCoderIT/BankAPIMockup/src/models"
-	"golang.org/x/crypto/bcrypt"
 	"net/http"
 )
 
