@@ -1,14 +1,7 @@
 package main
 
-import (
-	"fmt"
-	"net/http"
-
-	"github.com/spaghettiCoderIT/BankAPIMockup/src/router"
-)
+import "github.com/spaghettiCoderIT/BankAPIMockup/src/app"
 
 func main() {
-	router := router.GetRouter()
-	fmt.Println("Listening on port 3000")
-	http.ListenAndServe(":3000", router)
+	app.Run()
 }

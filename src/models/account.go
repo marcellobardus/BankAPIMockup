@@ -1,7 +1,11 @@
 package models
 
 import (
+	"crypto/md5"
+	"encoding/hex"
+	"hash/adler32"
 	"log"
+	"strings"
 	"time"
 )
 
@@ -12,7 +16,7 @@ type Account struct {
 	Mail        string `bson:"mail" json:"mail"`
 	PhoneNumber string `bson:"phonenumber" json:"phonenumber"`
 
-	LoginID           uint64 `bson:"loginid" json:"loginid"`
+	LoginID           uint32 `bson:"loginid" json:"loginid"`
 	SocialInsuranceID string `bson:"socialinsuranceid" json:"socialinsuranceid"`
 	PasswordHash      string `bson:"passwordhash" json:"passwordhash"`
 
@@ -60,5 +64,23 @@ func (account *Account) GenerateLoginID() {
 		return
 	}
 
-	account.LoginID = 9999999999999999999
+	concatenatedString := stringConcatenation(
+		account.Name,
+		account.Surname,
+		account.SocialInsuranceID,
+		account.RegistrationDate.Format(("20060102150405")))
+
+	md5Hash := md5.Sum([]byte(concatenatedString))
+	md5HashToString := hex.EncodeToString(md5Hash[:])
+	adler32Hash := adler32.Checksum([]byte(md5HashToString))
+
+	account.LoginID = adler32Hash
+}
+
+func stringConcatenation(strs ...string) string {
+	var sb strings.Builder
+	for _, str := range strs {
+		sb.WriteString(str)
+	}
+	return sb.String()
 }

@@ -2,7 +2,6 @@ package router
 
 import (
 	"encoding/json"
-	"fmt"
 	"github.com/spaghettiCoderIT/BankAPIMockup/src/models"
 	"net/http"
 )
@@ -26,9 +25,11 @@ func createNewUser(w http.ResponseWriter, req *http.Request) {
 		registration.SocialInsuranceID,
 		registration.PasswordHash)
 
+	account.GenerateLoginID()
+
 	if err := database.InsertAccount(account); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Fprintln(w, "Success")
+	return
 }

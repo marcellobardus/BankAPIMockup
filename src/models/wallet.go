@@ -10,7 +10,9 @@ type Wallet struct {
 	BankName    string  `bson:"bankname" json:"bankname"`
 	BankCountry string  `bson:"bankcountry" json:"bankcountry"`
 	IBAN        string  `bson:"iban" json:"iban"`
-	balance     float64 `bson:"balance"`
+	Balance     float64 `bson:"balance" json:"balance"`
+
+	OwnerSocialInsuranceID string `bson:"ownersocialinsuranceid" json:"ownersocialinsuranceid"`
 }
 
 // NewWallet creates a new Wallet args: currency ex. "USD", bankName ex. "AliorBank", bankCountry ex. "PL"
@@ -29,7 +31,7 @@ func (wallet *Wallet) IncreaseBalance(amount float64) {
 		return
 	}
 
-	wallet.balance += amount
+	wallet.Balance += amount
 }
 
 // DecreaseBalance decreases wallet balance by the given amount
@@ -39,7 +41,12 @@ func (wallet *Wallet) DecreaseBalance(amount float64) {
 		return
 	}
 
-	wallet.balance -= amount
+	wallet.Balance -= amount
+}
+
+// ResetBalance sets wallet balance to 0
+func (wallet *Wallet) ResetBalance() {
+	wallet.Balance = 0
 }
 
 // SetIBAN generates and sets a new IBAN for the given wallet, if IBAN is already set throws an error
