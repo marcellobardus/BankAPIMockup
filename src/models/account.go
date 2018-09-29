@@ -22,7 +22,7 @@ type Account struct {
 
 	RegistrationDate time.Time `bson:"registrationdate" json:"registrationdate"`
 
-	Wallets []Wallet
+	Wallets map[string]*Wallet
 }
 
 // NewAccount creates a new account assigned to a specified person
@@ -39,21 +39,8 @@ func NewAccount(name string, surname string, mail string, phonenumber string, so
 }
 
 // AssignNewWallet checks if given wallet can be appended to account's wallet and appends it.
-func (account *Account) AssignNewWallet(w Wallet) {
-	if account.Wallets == nil {
-		account.Wallets = make([]Wallet, 0)
-		account.Wallets = append(account.Wallets, w)
-		return
-	}
-
-	for i := 0; i < len(account.Wallets); i++ {
-		if account.Wallets[i].Currency == w.Currency {
-			log.Fatal("account with the given currency already exists")
-			return
-		}
-	}
-
-	account.Wallets = append(account.Wallets, w)
+func (account *Account) AssignNewWallet(w *Wallet) {
+	account.Wallets[w.Currency] = w
 
 }
 

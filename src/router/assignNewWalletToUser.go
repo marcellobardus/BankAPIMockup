@@ -25,7 +25,7 @@ func assingNewWalletToUser(w http.ResponseWriter, req *http.Request) {
 		data.OwnerSocialInsuranceID)
 
 	wallet.SetIBAN()
-	wallet.ResetBalance()
+	wallet.SetHash()
 
 	if err := database.InsertWallet(wallet); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)

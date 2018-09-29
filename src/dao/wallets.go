@@ -4,17 +4,19 @@ import (
 	"errors"
 	"github.com/spaghettiCoderIT/BankAPIMockup/src/models"
 	"gopkg.in/mgo.v2/bson"
+	"log"
 )
 
 // InsertWallet inserts a new struct Account {...} into mongoDB collection: wallets
 func (dao *BankMockupDAO) InsertWallet(wallet *models.Wallet) error {
-	existingWallet, selectionError := dao.GetWalletByOwnerSocialInsuranceID(wallet.OwnerSocialInsuranceID)
+	existingWallet, selectionError := dao.GetWalletByDataHash(wallet.DataHash)
 	if selectionError != nil && selectionError.Error() != "not found" {
+		log.Println(selectionError.Error())
 		panic("An error occured while inserting into db: ")
 	}
 
 	if existingWallet != nil {
-		return errors.New("Could not create a new wallet because, one with the given OwnerSocialInsuranceID already exists")
+		return errors.New("Could not create a new wallet because, wallet with this data set already exists")
 	}
 
 	err := db.C(WalletsCollection).Insert(wallet)
@@ -37,6 +39,13 @@ func (dao *BankMockupDAO) UpdateWalletByOwnerSocialInsuranceID(wallet *models.Wa
 func (dao *BankMockupDAO) GetWalletByOwnerSocialInsuranceID(id string) (*models.Wallet, error) {
 	var wallet *models.Wallet
 	err := db.C(WalletsCollection).Find(bson.M{"ownersocialinsuranceid": id}).One(&wallet)
+	return wallet, err
+}
+
+// GetWalletByDataHash selects a specified wallet from collection: wallets
+func (dao *BankMockupDAO) GetWalletByDataHash(hash string) (*models.Wallet, error) {
+	var wallet *models.Wallet
+	err := db.C(WalletsCollection).Find(bson.M{"datahash": hash}).One(&wallet)
 	return wallet, err
 }
 

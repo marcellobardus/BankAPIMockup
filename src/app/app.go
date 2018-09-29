@@ -10,10 +10,10 @@ import (
 
 var Database dao.BankMockupDAO
 
+// Run start the entire app
 func Run() {
-
 	Database.Database = "bankmockupdb"
-	Database.Server = "localhost"
+	Database.Server = "0.0.0.0"
 	Database.ConnectToDatabase()
 
 	router := router.GetRouter()

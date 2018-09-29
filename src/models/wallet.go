@@ -1,18 +1,21 @@
 package models
 
 import (
+	"github.com/cespare/xxhash"
 	"log"
 )
 
 // Wallet represent a bank account not assigned to anyone, it's created to let move wallets between customers
 type Wallet struct {
-	Currency    string  `bson:"currency" json:"currency"`
-	BankName    string  `bson:"bankname" json:"bankname"`
-	BankCountry string  `bson:"bankcountry" json:"bankcountry"`
-	IBAN        string  `bson:"iban" json:"iban"`
-	Balance     float64 `bson:"balance" json:"balance"`
+	Currency    string `bson:"currency" json:"currency"`
+	BankName    string `bson:"bankname" json:"bankname"`
+	BankCountry string `bson:"bankcountry" json:"bankcountry"`
+	IBAN        string `bson:"iban" json:"iban"`
+	Balance     int64  `bson:"balance" json:"balance"`
 
 	OwnerSocialInsuranceID string `bson:"ownersocialinsuranceid" json:"ownersocialinsuranceid"`
+
+	DataHash string `bson:"datahash" json:"datahash"`
 }
 
 // NewWallet creates a new Wallet args: currency ex. "USD", bankName ex. "AliorBank", bankCountry ex. "PL"
@@ -26,7 +29,7 @@ func NewWallet(currency string, bankName string, bankCountry string, ownerSocial
 }
 
 // IncreaseBalance increases wallet balance by the given amount
-func (wallet *Wallet) IncreaseBalance(amount float64) {
+func (wallet *Wallet) IncreaseBalance(amount int64) {
 	if amount < 0 {
 		log.Fatal("amount can not be less than 0")
 		return
@@ -36,7 +39,7 @@ func (wallet *Wallet) IncreaseBalance(amount float64) {
 }
 
 // DecreaseBalance decreases wallet balance by the given amount
-func (wallet *Wallet) DecreaseBalance(amount float64) {
+func (wallet *Wallet) DecreaseBalance(amount int64) {
 	if amount < 0 {
 		log.Fatal("amount can not be less than 0")
 		return
@@ -58,4 +61,16 @@ func (wallet *Wallet) SetIBAN() {
 	}
 
 	wallet.IBAN = "NotARealIBAN" // TODO
+}
+
+// SetHash sets the wallet hash which proofs it's uniqueness
+func (wallet *Wallet) SetHash() {
+	data := stringConcatenation(
+		wallet.OwnerSocialInsuranceID,
+		wallet.IBAN,
+		wallet.BankName,
+		wallet.BankCountry,
+		wallet.Currency)
+
+	wallet.DataHash = string(xxhash.Sum64String(data))
 }
