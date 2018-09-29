@@ -32,33 +32,33 @@ func (dao *BankMockupDAO) ConnectToDatabase() {
 }
 
 // InsertAccount inserts a new struct Account {...} into mongoDB
-func (dao *BankMockupDAO) InsertAccount(account models.Account) error {
-	err := db.C(AccountsCollection).Insert(&account)
+func (dao *BankMockupDAO) InsertAccount(account *models.Account) error {
+	err := db.C(AccountsCollection).Insert(account)
 	return err
 }
 
 // Delete deletes an account from the database
-func (dao *BankMockupDAO) Delete(account models.Account) error {
+func (dao *BankMockupDAO) Delete(account *models.Account) error {
 	err := db.C(AccountsCollection).Remove(&account)
 	return err
 }
 
 // UpdateByInsuranceID updates an index by it's social security number or PESEL etc...
-func (dao *BankMockupDAO) UpdateByInsuranceID(id string, account models.Account) error {
+func (dao *BankMockupDAO) UpdateByInsuranceID(id string, account *models.Account) error {
 	err := db.C(AccountsCollection).Update(bson.M{"socialinsuranceid": id}, &account)
 	return err
 }
 
 // GetAllAccounts return a list of all existing accounts in the database
-func (dao *BankMockupDAO) GetAllAccounts() ([]models.Account, error) {
+func (dao *BankMockupDAO) GetAllAccounts() (*[]models.Account, error) {
 	var accounts []models.Account
 	err := db.C(AccountsCollection).Find(bson.M{}).All(&accounts)
-	return accounts, err
+	return &accounts, err
 }
 
 // GetAccountBySocialInsuranceID selects a customer by it's social security number or PESEL etc...
-func (dao *BankMockupDAO) GetAccountBySocialInsuranceID(id string) (models.Account, error) {
+func (dao *BankMockupDAO) GetAccountBySocialInsuranceID(id string) (*models.Account, error) {
 	var account models.Account
 	err := db.C(AccountsCollection).Find(bson.M{"socialinsuranceid": id}).One(&account)
-	return account, err
+	return &account, err
 }

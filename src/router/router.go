@@ -11,6 +11,7 @@ func GetRouter() *mux.Router {
 	router := mux.NewRouter()
 	database.Database = "bankmockupdb"
 	database.Server = "localhost"
+	database.ConnectToDatabase()
 	router.HandleFunc("/createNewUser", createNewUser).Methods("POST")
 	return router
 }
