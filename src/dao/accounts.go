@@ -1,12 +1,22 @@
 package dao
 
 import (
+	"errors"
 	"github.com/spaghettiCoderIT/BankAPIMockup/src/models"
 	"gopkg.in/mgo.v2/bson"
 )
 
 // InsertAccount inserts a new struct Account {...} into mongoDB collection: accounts
 func (dao *BankMockupDAO) InsertAccount(account *models.Account) error {
+	existingAccount, selectionError := dao.GetAccountBySocialInsuranceID(account.SocialInsuranceID)
+	if selectionError != nil && selectionError.Error() != "not found" {
+		panic("An error occured while inserting into db: ")
+	}
+
+	if existingAccount != nil {
+		return errors.New("Could not create a new account because, one with the given SocialInsuranceID already exists")
+	}
+
 	err := db.C(AccountsCollection).Insert(account)
 	return err
 }
@@ -24,15 +34,15 @@ func (dao *BankMockupDAO) UpdateAccountByInsuranceID(id string, account *models.
 }
 
 // GetAllAccounts return a list of all existing accounts in the database collection: accounts
-func (dao *BankMockupDAO) GetAllAccounts() (*[]*models.Account, error) {
+func (dao *BankMockupDAO) GetAllAccounts() ([]*models.Account, error) {
 	var accounts []*models.Account
-	err := db.C(AccountsCollection).Find(bson.M{}).All(accounts)
-	return &accounts, err
+	err := db.C(AccountsCollection).Find(bson.M{}).All(&accounts)
+	return accounts, err
 }
 
 // GetAccountBySocialInsuranceID selects a customer by it's social security number or PESEL etc...
 func (dao *BankMockupDAO) GetAccountBySocialInsuranceID(id string) (*models.Account, error) {
-	var account models.Account
-	err := db.C(AccountsCollection).Find(bson.M{"socialinsuranceid": id}).One(account)
-	return &account, err
+	var account *models.Account
+	err := db.C(AccountsCollection).Find(bson.M{"socialinsuranceid": id}).One(&account)
+	return account, err
 }

@@ -16,11 +16,12 @@ type Wallet struct {
 }
 
 // NewWallet creates a new Wallet args: currency ex. "USD", bankName ex. "AliorBank", bankCountry ex. "PL"
-func NewWallet(currency string, bankName string, bankCountry string) *Wallet {
+func NewWallet(currency string, bankName string, bankCountry string, ownerSocialInsuranceID string) *Wallet {
 	w := new(Wallet)
 	w.Currency = currency
 	w.BankName = bankName
 	w.BankCountry = bankCountry
+	w.OwnerSocialInsuranceID = ownerSocialInsuranceID
 	return w
 }
 

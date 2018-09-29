@@ -11,12 +11,18 @@ func assingNewWalletToUser(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	defer req.Body.Close()
 
-	var wallet *models.Wallet
+	var data *models.WalletCreationForm
 
-	if err := json.NewDecoder(req.Body).Decode(&wallet); err != nil {
+	if err := json.NewDecoder(req.Body).Decode(&data); err != nil {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
 		return
 	}
+
+	wallet := models.NewWallet(
+		data.Currency,
+		data.BankName,
+		data.BankCountry,
+		data.OwnerSocialInsuranceID)
 
 	wallet.SetIBAN()
 	wallet.ResetBalance()
@@ -25,4 +31,6 @@ func assingNewWalletToUser(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	http.Error(w, "Success", 200)
+	return
 }

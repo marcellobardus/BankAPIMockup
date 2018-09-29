@@ -10,7 +10,7 @@ func createNewUser(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	defer req.Body.Close()
 
-	var registration models.RegisterForm
+	var registration models.AccountCreationForm
 
 	if err := json.NewDecoder(req.Body).Decode(&registration); err != nil {
 		http.Error(w, "Invalid request payload", http.StatusBadRequest)
@@ -31,5 +31,6 @@ func createNewUser(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	http.Error(w, "Success", 200)
 	return
 }
