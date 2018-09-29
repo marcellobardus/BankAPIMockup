@@ -7,6 +7,7 @@ import (
 
 var database dao.BankMockupDAO
 
+// GetRouter returns a router which just needs to be run
 func GetRouter() *mux.Router {
 	router := mux.NewRouter()
 	database.Database = "bankmockupdb"
