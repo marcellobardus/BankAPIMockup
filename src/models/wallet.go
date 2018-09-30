@@ -1,8 +1,10 @@
 package models
 
 import (
+	"errors"
 	"github.com/cespare/xxhash"
 	"log"
+	"math/rand"
 )
 
 // Wallet represent a bank account not assigned to anyone, it's created to let move wallets between customers
@@ -54,13 +56,27 @@ func (wallet *Wallet) ResetBalance() {
 }
 
 // SetIBAN generates and sets a new IBAN for the given wallet, if IBAN is already set throws an error
-func (wallet *Wallet) SetIBAN() {
+func (wallet *Wallet) SetIBAN() error {
 	if wallet.IBAN != "" {
-		log.Fatal("IBAN for this wallet is already set")
-		return
+		return errors.New("IBAN already set")
 	}
 
-	wallet.IBAN = "NotARealIBAN" // TODO
+	var codes map[string]string
+	codes = make(map[string]string)
+	codes["Poland"] = "PL"
+	codes["UnitedStates"] = "US"
+	codes["Germany"] = "DE"
+	codes["GreatBritain"] = "GB"
+	codes["Italy"] = "IT"
+
+	if codes[wallet.BankCountry] == "" {
+		return errors.New("The given country is not supported")
+	}
+
+	r := 10000000 + rand.Int()*(99999999-10000000)
+
+	wallet.IBAN = codes[wallet.BankCountry] + string(r)
+	return nil
 }
 
 // SetHash sets the wallet hash which proofs it's uniqueness

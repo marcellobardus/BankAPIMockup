@@ -24,7 +24,11 @@ func assingNewWalletToUser(w http.ResponseWriter, req *http.Request) {
 		data.BankCountry,
 		data.OwnerSocialInsuranceID)
 
-	wallet.SetIBAN()
+	if err := wallet.SetIBAN(); err != nil {
+		message := "Error while generating IBAN: " + err.Error()
+		http.Error(w, message, http.StatusBadRequest)
+		return
+	}
 	wallet.SetHash()
 
 	if err := database.InsertWallet(wallet); err != nil {

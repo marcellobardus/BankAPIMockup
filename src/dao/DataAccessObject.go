@@ -19,6 +19,8 @@ const (
 	AccountsCollection = "accounts"
 	// WalletsCollection cointains the name of wallets collection name in mongoDB
 	WalletsCollection = "wallets"
+	// TransactionsCollection cointains the name of transaction collection name in mongoDB
+	TransactionsCollection = "transactions"
 )
 
 // ConnectToDatabase function establishes a connection to MongoDB databse

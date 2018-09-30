@@ -42,6 +42,13 @@ func (dao *BankMockupDAO) GetWalletByOwnerSocialInsuranceID(id string) (*models.
 	return wallet, err
 }
 
+// GetWalletByIBAN selects a specified wallet from collection: wallets
+func (dao *BankMockupDAO) GetWalletByIBAN(id string) (*models.Wallet, error) {
+	var wallet *models.Wallet
+	err := db.C(WalletsCollection).Find(bson.M{"iban": id}).One(&wallet)
+	return wallet, err
+}
+
 // GetWalletByDataHash selects a specified wallet from collection: wallets
 func (dao *BankMockupDAO) GetWalletByDataHash(hash string) (*models.Wallet, error) {
 	var wallet *models.Wallet
