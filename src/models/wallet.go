@@ -5,6 +5,7 @@ import (
 	"github.com/cespare/xxhash"
 	"log"
 	"math/rand"
+	"strconv"
 )
 
 // Wallet represent a bank account not assigned to anyone, it's created to let move wallets between customers
@@ -17,7 +18,7 @@ type Wallet struct {
 
 	OwnerSocialInsuranceID string `bson:"ownersocialinsuranceid" json:"ownersocialinsuranceid"`
 
-	DataHash string `bson:"datahash" json:"datahash"`
+	DataHash int64 `bson:"datahash" json:"datahash"`
 }
 
 // NewWallet creates a new Wallet args: currency ex. "USD", bankName ex. "AliorBank", bankCountry ex. "PL"
@@ -73,9 +74,12 @@ func (wallet *Wallet) SetIBAN() error {
 		return errors.New("The given country is not supported")
 	}
 
-	r := 10000000 + rand.Int()*(99999999-10000000)
-
-	wallet.IBAN = codes[wallet.BankCountry] + string(r)
+	randomInt := 10000000 + rand.Int()*(99999999-10000000)
+	if randomInt < 0 {
+		randomInt = randomInt * -1
+	}
+	r := strconv.Itoa(10000000 + rand.Int()*(99999999-10000000))
+	wallet.IBAN = codes[wallet.BankCountry] + r
 	return nil
 }
 
@@ -88,5 +92,5 @@ func (wallet *Wallet) SetHash() {
 		wallet.BankCountry,
 		wallet.Currency)
 
-	wallet.DataHash = string(xxhash.Sum64String(data))
+	wallet.DataHash = int64(xxhash.Sum64String(data) / 2)
 }

@@ -31,7 +31,16 @@ func assingNewWalletToUser(w http.ResponseWriter, req *http.Request) {
 	}
 	wallet.SetHash()
 
-	if err := database.InsertWallet(wallet); err != nil {
+	ownerAccount, err := database.GetAccountBySocialInsuranceID(wallet.OwnerSocialInsuranceID)
+
+	if err != nil && err.Error() != "not found" {
+		http.Error(w, "Account with wallets owner social insurance id does not exists", http.StatusInternalServerError)
+		return
+	}
+
+	ownerAccount.Wallets[wallet.Currency] = wallet
+
+	if err := database.UpdateAccountByInsuranceID(wallet.OwnerSocialInsuranceID, ownerAccount); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

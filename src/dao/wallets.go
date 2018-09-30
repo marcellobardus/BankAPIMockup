@@ -16,7 +16,9 @@ func (dao *BankMockupDAO) InsertWallet(wallet *models.Wallet) error {
 	}
 
 	if existingWallet != nil {
-		return errors.New("Could not create a new wallet because, wallet with this data set already exists")
+		walletHash := string(wallet.DataHash)
+		message := "Could not create a new wallet because, wallet with this data set already exists, existing wallet hash: " + walletHash
+		return errors.New(message)
 	}
 
 	err := db.C(WalletsCollection).Insert(wallet)
@@ -50,7 +52,7 @@ func (dao *BankMockupDAO) GetWalletByIBAN(id string) (*models.Wallet, error) {
 }
 
 // GetWalletByDataHash selects a specified wallet from collection: wallets
-func (dao *BankMockupDAO) GetWalletByDataHash(hash string) (*models.Wallet, error) {
+func (dao *BankMockupDAO) GetWalletByDataHash(hash int64) (*models.Wallet, error) {
 	var wallet *models.Wallet
 	err := db.C(WalletsCollection).Find(bson.M{"datahash": hash}).One(&wallet)
 	return wallet, err

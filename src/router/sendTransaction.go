@@ -60,10 +60,16 @@ func sendTransaction(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	if len(senderAccount.Wallets) == 0 || len(recipientAccount.Wallets) == 0 {
+		http.Error(w, "One of the given accounts or both don't have any wallet assigned", http.StatusInternalServerError)
+		return
+	}
+
 	transaction := models.NewTransaction(
 		senderAccount,
 		recipientAccount,
-		transactionForm.Amount)
+		transactionForm.Amount,
+		transactionForm.Currency)
 
 	transaction.SetFee()
 	transaction.Realise()
@@ -72,6 +78,17 @@ func sendTransaction(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	if err := database.UpdateAccountByInsuranceID(senderAccount.SocialInsuranceID, senderAccount); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := database.UpdateAccountByInsuranceID(recipientAccount.SocialInsuranceID, recipientAccount); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	http.Error(w, "Success", 200)
 	return
 }

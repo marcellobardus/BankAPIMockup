@@ -24,11 +24,12 @@ type Transaction struct {
 }
 
 // NewTransaction creates new transaction
-func NewTransaction(sender *Account, recipient *Account, amount int64) *Transaction {
+func NewTransaction(sender *Account, recipient *Account, amount int64, currency string) *Transaction {
 	t := new(Transaction)
 	t.Amount = amount
 	t.Sender = sender
 	t.Recipient = recipient
+	t.TransactionCurrency = currency
 	t.Status = Unconfirmed
 	return t
 }
@@ -56,6 +57,7 @@ func (transaction *Transaction) Realise() error {
 
 // TODO
 func (transaction *Transaction) setTransactionHash() {
+	transaction.TransactionHash = "0x9876rfcvbnjkm"
 
 }
 
