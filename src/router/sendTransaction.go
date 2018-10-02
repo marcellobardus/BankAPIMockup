@@ -3,7 +3,6 @@ package router
 import (
 	"encoding/json"
 	"github.com/spaghettiCoderIT/BankAPIMockup/src/models"
-	"log"
 	"net/http"
 )
 
@@ -28,36 +27,15 @@ func sendTransaction(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	recipientWallet, recErr := database.GetWalletByIBAN(transactionForm.RecipientIBAN)
-	senderWallet, sendErr := database.GetWalletByIBAN(transactionForm.SenderIBAN)
+	senderAccount, recErr := database.GetAccountBySocialInsuranceID(transactionForm.SenderSocialInsuranceID)
+	recipientAccount, sendErr := database.GetAccountByWalletIBAN(transactionForm.Currency, transactionForm.RecipientIBAN)
 
-	if recErr != nil {
-		log.Println(recErr.Error())
-		http.Error(w, "Wallet with the given IBAN does not exists", http.StatusBadRequest)
-		return
+	if recErr != nil && recErr.Error() == "not found" {
+		http.Error(w, "the given sender IBAN is uncorrect", http.StatusBadRequest)
 	}
 
-	if sendErr != nil {
-		log.Println(sendErr.Error())
-		http.Error(w, "Wallet with the given IBAN does not exists", http.StatusBadRequest)
-		return
-	}
-
-	recipientAccount, recErr := database.GetAccountBySocialInsuranceID(recipientWallet.OwnerSocialInsuranceID)
-	senderAccount, sendErr := database.GetAccountBySocialInsuranceID(senderWallet.OwnerSocialInsuranceID)
-
-	if recErr != nil {
-		log.Println(recErr.Error())
-		message := "Wallet with OwnerSocialInsuranceID: " + recipientWallet.OwnerSocialInsuranceID + " is not assigned to any user"
-		http.Error(w, message, http.StatusBadRequest)
-		return
-	}
-
-	if sendErr != nil {
-		log.Println(sendErr.Error())
-		message := "Wallet with OwnerSocialInsuranceID: " + senderWallet.OwnerSocialInsuranceID + " is not assigned to any user"
-		http.Error(w, message, http.StatusBadRequest)
-		return
+	if sendErr != nil && sendErr.Error() == "not found" {
+		http.Error(w, "the given recipient IBAN is uncorrect", http.StatusBadRequest)
 	}
 
 	if len(senderAccount.Wallets) == 0 || len(recipientAccount.Wallets) == 0 {

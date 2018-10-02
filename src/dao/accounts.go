@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/spaghettiCoderIT/BankAPIMockup/src/models"
 	"gopkg.in/mgo.v2/bson"
+	"strings"
 )
 
 // InsertAccount inserts a new struct Account {...} into mongoDB collection: accounts
@@ -44,5 +45,13 @@ func (dao *BankMockupDAO) GetAllAccounts() ([]*models.Account, error) {
 func (dao *BankMockupDAO) GetAccountBySocialInsuranceID(id string) (*models.Account, error) {
 	var account *models.Account
 	err := db.C(AccountsCollection).Find(bson.M{"socialinsuranceid": id}).One(&account)
+	return account, err
+}
+
+// GetAccountByWalletIBAN returns an account which cointains a wallet with the given currency and IBAN
+func (dao *BankMockupDAO) GetAccountByWalletIBAN(currency string, iban string) (*models.Account, error) {
+	var account *models.Account
+	field := "wallets." + strings.ToUpper(currency) + ".iban"
+	err := db.C(AccountsCollection).Find(bson.M{field: iban}).One(&account)
 	return account, err
 }
