@@ -1,5 +1,6 @@
 package models
 
+// TransactionSendForm
 type TransactionSendForm struct {
 	Amount                  int64  `bson:"amount" json:"amount"`
 	Currency                string `bson:"currency" json:"currency"`

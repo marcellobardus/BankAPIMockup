@@ -27,15 +27,17 @@ func sendTransaction(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	senderAccount, recErr := database.GetAccountBySocialInsuranceID(transactionForm.SenderSocialInsuranceID)
-	recipientAccount, sendErr := database.GetAccountByWalletIBAN(transactionForm.Currency, transactionForm.RecipientIBAN)
+	senderAccount, sendErr := database.GetAccountBySocialInsuranceID(transactionForm.SenderSocialInsuranceID)
+	recipientAccount, recErr := database.GetAccountByWalletIBAN(transactionForm.Currency, transactionForm.RecipientIBAN)
 
-	if recErr != nil && recErr.Error() == "not found" {
-		http.Error(w, "the given sender IBAN is uncorrect", http.StatusBadRequest)
+	if recErr != nil {
+		http.Error(w, "the given sender IBAN is uncorrect: "+recErr.Error(), http.StatusBadRequest)
+		return
 	}
 
-	if sendErr != nil && sendErr.Error() == "not found" {
-		http.Error(w, "the given recipient IBAN is uncorrect", http.StatusBadRequest)
+	if sendErr != nil {
+		http.Error(w, "the given recipient IBAN is uncorrect: "+sendErr.Error(), http.StatusBadRequest)
+		return
 	}
 
 	if len(senderAccount.Wallets) == 0 || len(recipientAccount.Wallets) == 0 {

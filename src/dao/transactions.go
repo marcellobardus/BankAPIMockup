@@ -34,6 +34,7 @@ func (dao *BankMockupDAO) GetTransactionByHash(hash string) (*models.Transaction
 	return transaction, err
 }
 
+// GetTransactionsByRecipientIBAN returns a list of transaction addresses to a specified IBAN
 func (dao *BankMockupDAO) GetTransactionsByRecipientIBAN(iban string) ([]*models.Transaction, error) {
 	var transactions []*models.Transaction
 	err := db.C(TransactionsCollection).Find(bson.M{}).All(&transactions)

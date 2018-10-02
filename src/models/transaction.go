@@ -1,6 +1,7 @@
 package models
 
 import (
+	"crypto/sha256"
 	"errors"
 	"github.com/spaghettiCoderIT/BankAPIMockup/src/config"
 	"time"
@@ -55,10 +56,25 @@ func (transaction *Transaction) Realise() error {
 	return nil
 }
 
-// TODO
 func (transaction *Transaction) setTransactionHash() {
-	transaction.TransactionHash = "0x9876rfcvbnjkm"
+	amount := string(transaction.Amount)
+	sender := transaction.Sender.Wallets[transaction.TransactionCurrency].IBAN
+	recipient := transaction.Recipient.Wallets[transaction.TransactionCurrency].IBAN
+	currency := transaction.TransactionCurrency
+	timeOfLeaving := transaction.TimeOfLeaving.String()
+	timeOfComing := transaction.TimeOfComing.String()
 
+	hashData := []byte(stringConcatenation(
+		timeOfLeaving,
+		timeOfComing,
+		amount,
+		sender,
+		recipient,
+		currency))
+
+	hash := sha256.Sum256(hashData)
+
+	transaction.TransactionHash = string(hash[:])
 }
 
 // TransactionStatus defines transaction status

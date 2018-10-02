@@ -3,8 +3,8 @@ package models
 import (
 	"errors"
 	"github.com/cespare/xxhash"
+	"hash/adler32"
 	"log"
-	"math/rand"
 	"strconv"
 )
 
@@ -74,12 +74,13 @@ func (wallet *Wallet) SetIBAN() error {
 		return errors.New("The given country is not supported")
 	}
 
-	randomInt := 10000000 + rand.Int()*(99999999-10000000)
-	if randomInt < 0 {
-		randomInt = randomInt * -1
-	}
-	r := strconv.Itoa(10000000 + rand.Int()*(99999999-10000000))
-	wallet.IBAN = codes[wallet.BankCountry] + r
+	hash := adler32.Checksum([]byte(stringConcatenation(
+		wallet.Currency,
+		wallet.BankName,
+		wallet.OwnerSocialInsuranceID)))
+
+	hashString := strconv.FormatUint(uint64(hash)*100, 10)
+	wallet.IBAN = codes[wallet.BankCountry] + string(hashString)
 	return nil
 }
 

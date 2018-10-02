@@ -53,5 +53,10 @@ func (dao *BankMockupDAO) GetAccountByWalletIBAN(currency string, iban string) (
 	var account *models.Account
 	field := "wallets." + strings.ToUpper(currency) + ".iban"
 	err := db.C(AccountsCollection).Find(bson.M{field: iban}).One(&account)
+
+	if account == nil {
+		return account, errors.New("There is no account with the given IBAN, or the given currency is invalid for the given IBAN")
+	}
+
 	return account, err
 }
