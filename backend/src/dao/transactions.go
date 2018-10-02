@@ -2,7 +2,7 @@ package dao
 
 import (
 	"errors"
-	"github.com/spaghettiCoderIT/BankAPIMockup/src/models"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/models"
 	"gopkg.in/mgo.v2/bson"
 	"log"
 )

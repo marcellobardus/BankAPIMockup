@@ -2,7 +2,7 @@ package router
 
 import (
 	"encoding/json"
-	"github.com/spaghettiCoderIT/BankAPIMockup/src/models"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/models"
 
 	"net/http"
 )

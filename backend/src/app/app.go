@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/spaghettiCoderIT/BankAPIMockup/src/dao"
-	"github.com/spaghettiCoderIT/BankAPIMockup/src/router"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/dao"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/router"
 )
 
 var Database dao.BankMockupDAO

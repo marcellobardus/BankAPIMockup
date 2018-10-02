@@ -2,7 +2,7 @@ package router
 
 import (
 	"encoding/json"
-	"github.com/spaghettiCoderIT/BankAPIMockup/src/models"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/models"
 	"net/http"
 )
 
@@ -28,6 +28,12 @@ func sendTransaction(w http.ResponseWriter, req *http.Request) {
 	}
 
 	senderAccount, sendErr := database.GetAccountBySocialInsuranceID(transactionForm.SenderSocialInsuranceID)
+
+	if _, exists := senderAccount.Wallets[transactionForm.Currency]; !exists {
+		http.Error(w, "You're trying to withdraw a currency which you haven't a wallet assigned", http.StatusBadRequest)
+		return
+	}
+
 	recipientAccount, recErr := database.GetAccountByWalletIBAN(transactionForm.Currency, transactionForm.RecipientIBAN)
 
 	if recErr != nil {

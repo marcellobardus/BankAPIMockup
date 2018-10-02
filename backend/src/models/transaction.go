@@ -3,7 +3,7 @@ package models
 import (
 	"crypto/sha256"
 	"errors"
-	"github.com/spaghettiCoderIT/BankAPIMockup/src/config"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/config"
 	"time"
 )
 

@@ -2,7 +2,7 @@ package router
 
 import (
 	"github.com/gorilla/mux"
-	"github.com/spaghettiCoderIT/BankAPIMockup/src/dao"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/dao"
 )
 
 var database dao.BankMockupDAO
