@@ -17,10 +17,10 @@ var db *mgo.Database
 const (
 	// AccountsCollection cointains the name of accounts collection name in mongoDB
 	AccountsCollection = "accounts"
-	// WalletsCollection cointains the name of wallets collection name in mongoDB
-	WalletsCollection = "wallets"
 	// TransactionsCollection cointains the name of transaction collection name in mongoDB
 	TransactionsCollection = "transactions"
+	// AuthorizationsCollection cointains authorized keys
+	AuthorizationsCollection = "authorizations"
 )
 
 // ConnectToDatabase function establishes a connection to MongoDB databse

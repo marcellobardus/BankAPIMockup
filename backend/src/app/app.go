@@ -2,6 +2,7 @@ package app
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/dao"
@@ -18,5 +19,8 @@ func Run() {
 
 	router := router.GetRouter()
 	fmt.Println("Listening on port 3000")
-	http.ListenAndServe(":3000", router)
+	err := http.ListenAndServe(":3000", router)
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }

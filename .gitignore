@@ -14,3 +14,8 @@
 # .DS_Store
 .DS_Store
 backend/.DS_Store
+
+# Certificates
+backend/src/server.csr
+backend/src/server.key
+backend/src/server.crt
