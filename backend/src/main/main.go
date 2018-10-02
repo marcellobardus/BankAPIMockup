@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/spaghettiCoderIT/BankAPIMockup/src/app"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/app"
 )
 
 func main() {
