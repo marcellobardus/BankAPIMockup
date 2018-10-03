@@ -3,9 +3,9 @@ package models
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/utils"
 	"hash/adler32"
 	"log"
-	"strings"
 	"time"
 )
 
@@ -51,7 +51,7 @@ func (account *Account) GenerateLoginID() {
 		return
 	}
 
-	concatenatedString := stringConcatenation(
+	concatenatedString := utils.StringConcatenation(
 		account.Name,
 		account.Surname,
 		account.SocialInsuranceID,
@@ -62,12 +62,4 @@ func (account *Account) GenerateLoginID() {
 	adler32Hash := adler32.Checksum([]byte(md5HashToString))
 
 	account.LoginID = adler32Hash
-}
-
-func stringConcatenation(strs ...string) string {
-	var sb strings.Builder
-	for _, str := range strs {
-		sb.WriteString(str)
-	}
-	return sb.String()
 }

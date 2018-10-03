@@ -27,7 +27,14 @@ func sendTransaction(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	senderAccount, sendErr := database.GetAccountBySocialInsuranceID(transactionForm.SenderSocialInsuranceID)
+	senderAuthorization, authErr := database.GetAuthorizationByToken(transactionForm.AuthorizationToken)
+
+	if authErr != nil {
+		http.Error(w, "Your token is obsolete you need to relogin", http.StatusForbidden)
+		return
+	}
+
+	senderAccount := senderAuthorization.AuthorizedAccount
 
 	if _, exists := senderAccount.Wallets[transactionForm.Currency]; !exists {
 		http.Error(w, "You're trying to withdraw a currency which you haven't a wallet assigned", http.StatusBadRequest)
@@ -38,11 +45,6 @@ func sendTransaction(w http.ResponseWriter, req *http.Request) {
 
 	if recErr != nil {
 		http.Error(w, "the given sender IBAN is uncorrect: "+recErr.Error(), http.StatusBadRequest)
-		return
-	}
-
-	if sendErr != nil {
-		http.Error(w, "the given recipient IBAN is uncorrect: "+sendErr.Error(), http.StatusBadRequest)
 		return
 	}
 

@@ -7,4 +7,7 @@ type WalletCreationForm struct {
 	BankCountry string `bson:"bankcountry" json:"bankcountry"`
 
 	OwnerSocialInsuranceID string `bson:"ownersocialinsuranceid" json:"ownersocialinsuranceid"`
+
+	AuthorizationToken string   `bson:"token" json:"token"`
+	Google2FACode      [6]uint8 `bson:"2facode" json:"2facode"`
 }

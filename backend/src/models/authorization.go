@@ -3,6 +3,7 @@ package models
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/utils"
 	"math/rand"
 	"time"
 )
@@ -18,15 +19,17 @@ const (
 )
 
 type Authorization struct {
-	Endpoints  []string  `bson:"endpoints" json:"endpoints"`
-	Token      string    `bson:"token" json:"token"`
-	Expiration time.Time `bson:"expiration" json:"expiration"`
+	Endpoints         []string  `bson:"endpoints" json:"endpoints"`
+	Token             string    `bson:"token" json:"token"`
+	Expiration        time.Time `bson:"expiration" json:"expiration"`
+	AuthorizedAccount *Account  `bson:"authorizedaccount" json:"authorizedaccount"`
 }
 
-func NewAuthorization(endpoints []string, expiration time.Time) *Authorization {
+func NewAuthorization(endpoints []string, expiration time.Time, account *Account) *Authorization {
 	a := new(Authorization)
 	a.Endpoints = endpoints
 	a.Expiration = expiration
+	a.AuthorizedAccount = account
 	a.Token = setToken(endpoints, expiration)
 	return a
 }
@@ -43,10 +46,10 @@ func setToken(endpoints []string, expiration time.Time) string {
 	var endpointsConc string
 
 	for i := range endpoints {
-		endpointsConc = stringConcatenation(endpoints[i], "")
+		endpointsConc = utils.StringConcatenation(endpoints[i], "")
 	}
 
-	hashData := stringConcatenation(string(bytesArray), endpointsConc, expiration.String())
+	hashData := utils.StringConcatenation(string(bytesArray), endpointsConc, expiration.String())
 	md5Hash := md5.Sum([]byte(hashData))
 	token := hex.EncodeToString(md5Hash[:])
 	return token

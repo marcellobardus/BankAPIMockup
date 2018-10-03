@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"errors"
 	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/config"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/utils"
 	"time"
 )
 
@@ -64,7 +65,7 @@ func (transaction *Transaction) setTransactionHash() {
 	timeOfLeaving := transaction.TimeOfLeaving.String()
 	timeOfComing := transaction.TimeOfComing.String()
 
-	hashData := []byte(stringConcatenation(
+	hashData := []byte(utils.StringConcatenation(
 		timeOfLeaving,
 		timeOfComing,
 		amount,

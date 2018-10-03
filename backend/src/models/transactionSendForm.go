@@ -8,7 +8,6 @@ type TransactionSendForm struct {
 	RecipientIBAN           string `bson:"recipientiban" json:"recipientiban"`
 	SenderSocialInsuranceID string `bson:"sendersocialinsuranceid" json:"sendersocialinsuranceid"`
 
-	SenderPasswordHash string `bson:"senderpasswordhash" json:"senderpasswordhash"`
-	SenderLoginID      uint32 `bson:"senderloginid" json:"senderloginid"`
-	SenderPhoneNumber  string `bson:"senderphonenumber" json:"senderphonenumber"`
+	AuthorizationToken string   `bson:"token" json:"token"`
+	Google2FACode      [6]uint8 `bson:"2facode" json:"2facode"`
 }

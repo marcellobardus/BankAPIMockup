@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"github.com/cespare/xxhash"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/utils"
 	"hash/adler32"
 	"log"
 	"strconv"
@@ -74,7 +75,7 @@ func (wallet *Wallet) SetIBAN() error {
 		return errors.New("The given country is not supported")
 	}
 
-	hash := adler32.Checksum([]byte(stringConcatenation(
+	hash := adler32.Checksum([]byte(utils.StringConcatenation(
 		wallet.Currency,
 		wallet.BankName,
 		wallet.OwnerSocialInsuranceID)))
@@ -86,7 +87,7 @@ func (wallet *Wallet) SetIBAN() error {
 
 // SetHash sets the wallet hash which proofs it's uniqueness
 func (wallet *Wallet) SetHash() {
-	data := stringConcatenation(
+	data := utils.StringConcatenation(
 		wallet.OwnerSocialInsuranceID,
 		wallet.IBAN,
 		wallet.BankName,
