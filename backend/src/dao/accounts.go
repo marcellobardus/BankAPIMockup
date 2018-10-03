@@ -60,3 +60,14 @@ func (dao *BankMockupDAO) GetAccountByWalletIBAN(currency string, iban string) (
 
 	return account, err
 }
+
+func (dao *BankMockupDAO) GetAccountByLoginID(loginid uint32) (*models.Account, error) {
+	var account *models.Account
+	err := db.C(AccountsCollection).Find(bson.M{"loginid": loginid}).One(&account)
+
+	if account == nil {
+		return account, errors.New("There is no account with the given LoginID")
+	}
+
+	return account, err
+}
