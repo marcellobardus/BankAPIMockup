@@ -3,9 +3,10 @@ package models
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/utils"
 	"math/rand"
 	"time"
+
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/utils"
 )
 
 type HttpMethod int
