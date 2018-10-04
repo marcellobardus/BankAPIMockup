@@ -3,12 +3,18 @@ package router
 import (
 	"encoding/json"
 	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/models"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/utils"
+	"log"
 	"net/http"
 )
 
 func sendTransaction(w http.ResponseWriter, req *http.Request) {
+	const thisEndpoint = "/sendTransaction"
+
 	w.Header().Set("Content-Type", "application/json")
 	defer req.Body.Close()
+
+	// Get request data
 
 	var transactionForm models.TransactionSendForm
 
@@ -22,10 +28,7 @@ func sendTransaction(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	if transactionForm.RecipientIBAN == transactionForm.SenderIBAN {
-		http.Error(w, "sender and recipient IBANs cannot be equal", http.StatusBadRequest)
-		return
-	}
+	// Authorize token
 
 	senderAuthorization, authErr := database.GetAuthorizationByToken(transactionForm.AuthorizationToken)
 
@@ -34,12 +37,23 @@ func sendTransaction(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	if !utils.IsInArray(thisEndpoint, senderAuthorization.Endpoints) {
+		http.Error(w, "Your token is not authorized to call this endpoint", http.StatusForbidden)
+		return
+	}
+
+	// Identify sender account by its token
+
 	senderAccount := senderAuthorization.AuthorizedAccount
+
+	// Check transfer conditions
 
 	if _, exists := senderAccount.Wallets[transactionForm.Currency]; !exists {
 		http.Error(w, "You're trying to withdraw a currency which you haven't a wallet assigned", http.StatusBadRequest)
 		return
 	}
+
+	// Identify recipient account by its IBAN
 
 	recipientAccount, recErr := database.GetAccountByWalletIBAN(transactionForm.Currency, transactionForm.RecipientIBAN)
 
@@ -53,6 +67,8 @@ func sendTransaction(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// Create a transaction
+
 	transaction := models.NewTransaction(
 		senderAccount,
 		recipientAccount,
@@ -60,6 +76,22 @@ func sendTransaction(w http.ResponseWriter, req *http.Request) {
 		transactionForm.Currency)
 
 	transaction.SetFee()
+
+	// Check if OTP is valid
+
+	authenticated, err := senderAccount.OTP.Authenticate(transactionForm.OTP)
+	if err != nil && err.Error() != "invalid code" {
+		http.Error(w, "A fatal error occured", http.StatusInternalServerError)
+		log.Panic(err.Error())
+	}
+
+	if !authenticated {
+		http.Error(w, "OTP is wrong", http.StatusBadRequest)
+		return
+	}
+
+	// Realise transaction and update accounts in db
+
 	transaction.Realise()
 
 	if err := database.InsertTransaction(transaction); err != nil {

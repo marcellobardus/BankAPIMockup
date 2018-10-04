@@ -14,7 +14,7 @@ func GetRouter() *mux.Router {
 	database.Server = "localhost"
 
 	router.HandleFunc("/assignNewWalletToUser", assingNewWalletToUser).Methods("POST")
-	router.HandleFunc("/createNewUser", createNewUser).Methods("POST")
+	router.HandleFunc("/createNewUser", registerUser).Methods("POST")
 	router.HandleFunc("/sendTransaction", sendTransaction).Methods("POST")
 	router.HandleFunc("/deposit", deposit).Methods("POST")
 	router.HandleFunc("/revertTransaction", reverseTransaction).Methods("POST")

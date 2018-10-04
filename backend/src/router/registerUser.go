@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func createNewUser(w http.ResponseWriter, req *http.Request) {
+func registerUser(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	defer req.Body.Close()
 
@@ -26,11 +26,12 @@ func createNewUser(w http.ResponseWriter, req *http.Request) {
 		registration.PasswordHash)
 
 	account.GenerateLoginID()
+	account.SetOPT()
 
 	if err := database.InsertAccount(account); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	http.Error(w, "Success", 200)
+	json.NewEncoder(w).Encode("Your 2FA secret key is: " + account.OTP.Secret)
 	return
 }

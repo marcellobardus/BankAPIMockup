@@ -3,9 +3,12 @@ package models
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"github.com/dgryski/dgoogauth"
 	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/utils"
 	"hash/adler32"
 	"log"
+	"math/rand"
+	"strconv"
 	"time"
 )
 
@@ -16,9 +19,10 @@ type Account struct {
 	Mail        string `bson:"mail" json:"mail"`
 	PhoneNumber string `bson:"phonenumber" json:"phonenumber"`
 
-	LoginID           uint32 `bson:"loginid" json:"loginid"`
-	SocialInsuranceID string `bson:"socialinsuranceid" json:"socialinsuranceid"`
-	PasswordHash      string `bson:"passwordhash" json:"passwordhash"`
+	LoginID           uint32               `bson:"loginid" json:"loginid"`
+	SocialInsuranceID string               `bson:"socialinsuranceid" json:"socialinsuranceid"`
+	PasswordHash      string               `bson:"passwordhash" json:"passwordhash"`
+	OTP               *dgoogauth.OTPConfig `bson:"otp" json:"otp"`
 
 	RegistrationDate time.Time `bson:"registrationdate" json:"registrationdate"`
 
@@ -62,4 +66,16 @@ func (account *Account) GenerateLoginID() {
 	adler32Hash := adler32.Checksum([]byte(md5HashToString))
 
 	account.LoginID = adler32Hash
+}
+
+func (account *Account) SetOPT() {
+	rand.NewSource(time.Now().UnixNano())
+	randomInt := rand.Intn(999999999999-9999) + 9999
+	md5Hash := md5.Sum([]byte(strconv.Itoa(randomInt)))
+	md5HashToString := hex.EncodeToString(md5Hash[:])
+	account.OTP = &dgoogauth.OTPConfig{
+		Secret:      md5HashToString,
+		WindowSize:  3,
+		HotpCounter: 0,
+	}
 }

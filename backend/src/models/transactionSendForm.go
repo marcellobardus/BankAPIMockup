@@ -2,12 +2,10 @@ package models
 
 // TransactionSendForm
 type TransactionSendForm struct {
-	Amount                  int64  `bson:"amount" json:"amount"`
-	Currency                string `bson:"currency" json:"currency"`
-	SenderIBAN              string `bson:"senderiban" json:"senderiban"`
-	RecipientIBAN           string `bson:"recipientiban" json:"recipientiban"`
-	SenderSocialInsuranceID string `bson:"sendersocialinsuranceid" json:"sendersocialinsuranceid"`
+	Amount        int64  `bson:"amount" json:"amount"`
+	Currency      string `bson:"currency" json:"currency"`
+	RecipientIBAN string `bson:"recipientiban" json:"recipientiban"`
 
-	AuthorizationToken string   `bson:"token" json:"token"`
-	Google2FACode      [6]uint8 `bson:"2facode" json:"2facode"`
+	AuthorizationToken string `bson:"token" json:"token"`
+	OTP                string `bson:"otp" json:"otp"`
 }

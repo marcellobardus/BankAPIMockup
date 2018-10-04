@@ -36,6 +36,19 @@ func userLogin(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	// 2FA
+
+	authenticated, err := account.OTP.Authenticate(login.OTP)
+	if err != nil && err.Error() != "invalid code" {
+		http.Error(w, "A fatal error occured", http.StatusInternalServerError)
+		log.Panic(err.Error())
+	}
+
+	if !authenticated {
+		http.Error(w, "OTP is wrong", http.StatusBadRequest)
+		return
+	}
+
 	// Create new authorization
 
 	authorization := models.NewAuthorization([]string{"/sendTransaction"}, time.Now().Add(config.UserSessionExpirationMinutes), account)
