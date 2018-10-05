@@ -1,6 +1,7 @@
 package router
 
 import (
+	"bytes"
 	"encoding/json"
 	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/config"
 	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/models"
@@ -13,12 +14,18 @@ func userLogin(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	defer req.Body.Close()
 
+	// Set response buffer
+
+	var buffer bytes.Buffer
+
 	// Get payload data
 
 	var login models.UserLoginForm
 
 	if err := json.NewDecoder(req.Body).Decode(&login); err != nil {
-		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		buffer.WriteString(`{err: true, message: "Invalid request payload"}`)
+		json.NewEncoder(w).Encode(buffer.String())
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -27,12 +34,16 @@ func userLogin(w http.ResponseWriter, req *http.Request) {
 	account, err := database.GetAccountByLoginID(login.LoginID)
 
 	if err != nil {
-		http.Error(w, "Wrong LoginID there is no account with the given one", http.StatusBadRequest)
+		buffer.WriteString(`{err: true, message: "Wrong LoginID there is no account with the given one"}`)
+		json.NewEncoder(w).Encode(buffer.String())
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
 	if login.PasswordHash != account.PasswordHash {
-		http.Error(w, "Wrong password", http.StatusBadRequest)
+		buffer.WriteString(`{err: true, message: "Wrong password"}`)
+		json.NewEncoder(w).Encode(buffer.String())
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -40,12 +51,17 @@ func userLogin(w http.ResponseWriter, req *http.Request) {
 
 	authenticated, err := account.OTP.Authenticate(login.OTP)
 	if err != nil && err.Error() != "invalid code" {
-		http.Error(w, "A fatal error occured", http.StatusInternalServerError)
+		buffer.WriteString(`{err: true, message: "A fatal error occured"}`)
+		json.NewEncoder(w).Encode(buffer.String())
+		w.WriteHeader(http.StatusInternalServerError)
 		log.Panic(err.Error())
+		return
 	}
 
 	if !authenticated {
-		http.Error(w, "OTP is wrong", http.StatusBadRequest)
+		buffer.WriteString(`{err: true, message: "OTP is wrong"}`)
+		json.NewEncoder(w).Encode(buffer.String())
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
@@ -56,20 +72,20 @@ func userLogin(w http.ResponseWriter, req *http.Request) {
 	err = database.InsertAuthorization(authorization)
 
 	if err != nil {
-		http.Error(w, "A fatal error occured", http.StatusInternalServerError)
+		buffer.WriteString(`{err: true, message: "A fatal error occured"}`)
+		json.NewEncoder(w).Encode(buffer.String())
+		w.WriteHeader(http.StatusInternalServerError)
 		log.Panic(err.Error())
+		return
 	}
 
 	// Return authorization token
 
-	tokenJSON, err := json.Marshal(authorization.Token)
+	response := models.NewLoginResponse(false, authorization.Token, "Success")
 
-	if err != nil {
-		http.Error(w, "A fatal error occured", http.StatusInternalServerError)
-		log.Panic(err.Error())
-	}
+	responseJSON, err := json.Marshal(response)
 
-	w.Write(tokenJSON)
+	w.Write(responseJSON)
 	http.Error(w, "Success", 200)
 	return
 }
