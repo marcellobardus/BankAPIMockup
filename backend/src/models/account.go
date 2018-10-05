@@ -3,13 +3,14 @@ package models
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"github.com/dgryski/dgoogauth"
-	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/utils"
 	"hash/adler32"
 	"log"
 	"math/rand"
 	"strconv"
 	"time"
+
+	"github.com/dgryski/dgoogauth"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/utils"
 )
 
 // Account is a representation of a person who own a wallet and it's personal data
