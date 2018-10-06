@@ -1,16 +1,16 @@
 package responses
 
 type SendTransactionResponse struct {
-	err             bool
-	transactionHash *string
-	message         string
-	errorCode       uint8
+	Err             bool    `json:"err"`
+	TransactionHash *string `json:"transactionhash"`
+	Message         string  `json:"message"`
+	ErrorCode       uint8   `json:"errorcode"`
 }
 
 func NewSendTransactionResponse(err bool, transactionHash *string, message string) *SendTransactionResponse {
 	res := new(SendTransactionResponse)
-	res.err = err
-	res.transactionHash = transactionHash
-	res.message = message
+	res.Err = err
+	res.TransactionHash = transactionHash
+	res.Message = message
 	return res
 }

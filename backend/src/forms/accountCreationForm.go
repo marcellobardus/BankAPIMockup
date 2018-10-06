@@ -10,6 +10,6 @@ type AccountCreationForm struct {
 	SocialInsuranceID string `bson:"socialinsuranceid" json:"socialinsuranceid"`
 	PasswordHash      string `bson:"passwordhash" json:"passwordhash"`
 
-	AuthorizationToken string   `bson:"token" json:"token"`
-	Google2FACode      [6]uint8 `bson:"2facode" json:"2facode"`
+	AuthorizationToken string `bson:"token" json:"token"`
+	Google2FACode      string `bson:"2facode" json:"2facode"`
 }

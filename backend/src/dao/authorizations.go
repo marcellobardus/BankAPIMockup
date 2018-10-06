@@ -4,7 +4,6 @@ import (
 	"errors"
 	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/models"
 	"gopkg.in/mgo.v2/bson"
-	"log"
 	"time"
 )
 
@@ -12,8 +11,7 @@ func (dao *BankMockupDAO) InsertAuthorization(authorization *models.Authorizatio
 	existingAuthorization, selectionErr := dao.GetAuthorizationByToken(authorization.Token)
 
 	if selectionErr != nil && selectionErr.Error() != "not found" {
-		log.Println(selectionErr.Error())
-		panic("An error occured while inserting into db: ")
+		return errors.New("An error occured while inserting into db: " + selectionErr.Error())
 	}
 
 	if existingAuthorization != nil {
@@ -31,6 +29,10 @@ func (dao *BankMockupDAO) InsertAuthorization(authorization *models.Authorizatio
 func (dao *BankMockupDAO) GetAuthorizationByToken(token string) (*models.Authorization, error) {
 	var authorization *models.Authorization
 	err := db.C(AuthorizationsCollection).Find(bson.M{"token": token}).One(&authorization)
+
+	if authorization == nil {
+		return authorization, err
+	}
 
 	if authorization.Expiration.Unix() <= time.Now().Unix() {
 		dao.DeleteAuthorization(authorization)

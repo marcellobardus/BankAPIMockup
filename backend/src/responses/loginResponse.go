@@ -1,16 +1,16 @@
 package responses
 
 type LoginResponse struct {
-	err       bool
-	token     *string
-	message   string
-	errorCode uint8
+	Err       bool    `json:"err"`
+	Token     *string `json:"token"`
+	Message   string  `json:"message"`
+	ErrorCode uint8   `json:"errorCode"`
 }
 
 func NewLoginResponse(err bool, token *string, message string) *LoginResponse {
 	res := new(LoginResponse)
-	res.err = err
-	res.token = token
-	res.message = message
+	res.Err = err
+	res.Token = token
+	res.Message = message
 	return res
 }

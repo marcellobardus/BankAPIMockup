@@ -2,6 +2,7 @@ package models
 
 import (
 	"crypto/md5"
+	"encoding/base32"
 	"encoding/hex"
 	"hash/adler32"
 	"log"
@@ -74,8 +75,9 @@ func (account *Account) SetOPT() {
 	randomInt := rand.Intn(999999999999-9999) + 9999
 	md5Hash := md5.Sum([]byte(strconv.Itoa(randomInt)))
 	md5HashToString := hex.EncodeToString(md5Hash[:])
+	base32EncodedHash := base32.StdEncoding.EncodeToString([]byte(md5HashToString))
 	account.OTP = &dgoogauth.OTPConfig{
-		Secret:      md5HashToString,
+		Secret:      base32EncodedHash,
 		WindowSize:  3,
 		HotpCounter: 0,
 	}

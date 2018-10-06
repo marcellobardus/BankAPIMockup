@@ -33,13 +33,13 @@ func registerUser(w http.ResponseWriter, req *http.Request) {
 	account.SetOPT()
 
 	if err := database.InsertAccount(account); err != nil {
-		response := responses.NewRegisterUserResponse(true, nil, nil, "A fatal error occured")
+		response := responses.NewRegisterUserResponse(true, nil, nil, err.Error())
 		responseJSON, _ := json.Marshal(response)
 		w.Write(responseJSON)
 		return
 	}
 
-	response := responses.NewRegisterUserResponse(false, &account.OTP.Secret, &account.LoginID, "A fatal error occured")
+	response := responses.NewRegisterUserResponse(false, &account.OTP.Secret, &account.LoginID, "Success")
 	responseJSON, _ := json.Marshal(response)
 	w.Write(responseJSON)
 	return

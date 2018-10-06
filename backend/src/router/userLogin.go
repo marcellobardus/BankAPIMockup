@@ -6,6 +6,7 @@ import (
 	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/forms"
 	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/models"
 	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/responses"
+	"log"
 
 	"net/http"
 	"time"
@@ -23,6 +24,7 @@ func userLogin(w http.ResponseWriter, req *http.Request) {
 		response := responses.NewLoginResponse(true, nil, "Invalid request payload")
 		responseJSON, _ := json.Marshal(response)
 		w.Write(responseJSON)
+		log.Println(err.Error())
 		return
 	}
 
