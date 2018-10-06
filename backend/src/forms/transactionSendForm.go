@@ -1,4 +1,4 @@
-package models
+package forms
 
 // TransactionSendForm
 type TransactionSendForm struct {

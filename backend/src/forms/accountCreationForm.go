@@ -1,4 +1,4 @@
-package models
+package forms
 
 // AccountCreationForm struct is required as interface when creating a new user via REST
 type AccountCreationForm struct {

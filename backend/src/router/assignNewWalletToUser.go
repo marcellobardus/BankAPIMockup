@@ -2,19 +2,24 @@ package router
 
 import (
 	"encoding/json"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/forms"
 	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/models"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/responses"
 
 	"net/http"
+	"strconv"
 )
 
 func assingNewWalletToUser(w http.ResponseWriter, req *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	defer req.Body.Close()
 
-	var data *models.WalletCreationForm
+	var data *forms.WalletCreationForm
 
 	if err := json.NewDecoder(req.Body).Decode(&data); err != nil {
-		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		response := responses.NewLoginResponse(true, nil, "Invalid request payload")
+		responseJSON, _ := json.Marshal(response)
+		w.Write(responseJSON)
 		return
 	}
 
@@ -25,8 +30,9 @@ func assingNewWalletToUser(w http.ResponseWriter, req *http.Request) {
 		data.OwnerSocialInsuranceID)
 
 	if err := wallet.SetIBAN(); err != nil {
-		message := "Error while generating IBAN: " + err.Error()
-		http.Error(w, message, http.StatusBadRequest)
+		response := responses.NewLoginResponse(true, nil, "Error while generating IBAN")
+		responseJSON, _ := json.Marshal(response)
+		w.Write(responseJSON)
 		return
 	}
 	wallet.SetHash()
@@ -34,16 +40,25 @@ func assingNewWalletToUser(w http.ResponseWriter, req *http.Request) {
 	ownerAccount, err := database.GetAccountBySocialInsuranceID(wallet.OwnerSocialInsuranceID)
 
 	if err != nil && err.Error() != "not found" {
-		http.Error(w, "Account with wallets owner social insurance id does not exists", http.StatusInternalServerError)
+		response := responses.NewLoginResponse(true, nil, "Account with wallets owner social insurance id does not exists")
+		responseJSON, _ := json.Marshal(response)
+		w.Write(responseJSON)
 		return
 	}
 
 	ownerAccount.Wallets[wallet.Currency] = wallet
 
 	if err := database.UpdateAccountByInsuranceID(wallet.OwnerSocialInsuranceID, ownerAccount); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response := responses.NewLoginResponse(true, nil, "A fatal error occured")
+		responseJSON, _ := json.Marshal(response)
+		w.Write(responseJSON)
 		return
 	}
-	http.Error(w, "Success", 200)
+
+	walletHash := strconv.Itoa(int(wallet.DataHash))
+
+	response := responses.NewLoginResponse(false, &walletHash, "Success")
+	responseJSON, _ := json.Marshal(response)
+	w.Write(responseJSON)
 	return
 }

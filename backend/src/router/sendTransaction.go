@@ -2,7 +2,9 @@ package router
 
 import (
 	"encoding/json"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/forms"
 	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/models"
+	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/responses"
 	"github.com/spaghettiCoderIT/BankAPIMockup/backend/src/utils"
 	"log"
 	"net/http"
@@ -16,15 +18,19 @@ func sendTransaction(w http.ResponseWriter, req *http.Request) {
 
 	// Get request data
 
-	var transactionForm models.TransactionSendForm
+	var transactionForm forms.TransactionSendForm
 
 	if err := json.NewDecoder(req.Body).Decode(&transactionForm); err != nil {
-		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+		response := responses.NewSendTransactionResponse(true, nil, "Invalid request payload")
+		responseJSON, _ := json.Marshal(response)
+		w.Write(responseJSON)
 		return
 	}
 
 	if transactionForm.Amount <= 0 {
-		http.Error(w, "Transaction amount must be greater than 0", http.StatusBadRequest)
+		response := responses.NewSendTransactionResponse(true, nil, "Transaction amount must be greater than 0")
+		responseJSON, _ := json.Marshal(response)
+		w.Write(responseJSON)
 		return
 	}
 
@@ -33,12 +39,16 @@ func sendTransaction(w http.ResponseWriter, req *http.Request) {
 	senderAuthorization, authErr := database.GetAuthorizationByToken(transactionForm.AuthorizationToken)
 
 	if authErr != nil {
-		http.Error(w, "Your token is obsolete you need to relogin", http.StatusForbidden)
+		response := responses.NewSendTransactionResponse(true, nil, "Your token is obsolete you need to relogin")
+		responseJSON, _ := json.Marshal(response)
+		w.Write(responseJSON)
 		return
 	}
 
 	if !utils.IsInArray(thisEndpoint, senderAuthorization.Endpoints) {
-		http.Error(w, "Your token is not authorized to call this endpoint", http.StatusForbidden)
+		response := responses.NewSendTransactionResponse(true, nil, "Your token is not authorized to call this endpoint")
+		responseJSON, _ := json.Marshal(response)
+		w.Write(responseJSON)
 		return
 	}
 
@@ -49,7 +59,9 @@ func sendTransaction(w http.ResponseWriter, req *http.Request) {
 	// Check transfer conditions
 
 	if _, exists := senderAccount.Wallets[transactionForm.Currency]; !exists {
-		http.Error(w, "You're trying to withdraw a currency which you haven't a wallet assigned", http.StatusBadRequest)
+		response := responses.NewSendTransactionResponse(true, nil, "You're trying to withdraw a currency which you haven't a wallet assigned")
+		responseJSON, _ := json.Marshal(response)
+		w.Write(responseJSON)
 		return
 	}
 
@@ -58,12 +70,16 @@ func sendTransaction(w http.ResponseWriter, req *http.Request) {
 	recipientAccount, recErr := database.GetAccountByWalletIBAN(transactionForm.Currency, transactionForm.RecipientIBAN)
 
 	if recErr != nil {
-		http.Error(w, "the given sender IBAN is uncorrect: "+recErr.Error(), http.StatusBadRequest)
+		response := responses.NewSendTransactionResponse(true, nil, "the given sender IBAN is uncorrect")
+		responseJSON, _ := json.Marshal(response)
+		w.Write(responseJSON)
 		return
 	}
 
 	if len(senderAccount.Wallets) == 0 || len(recipientAccount.Wallets) == 0 {
-		http.Error(w, "One of the given accounts or both don't have any wallet assigned", http.StatusInternalServerError)
+		response := responses.NewSendTransactionResponse(true, nil, "One of the given accounts or both don't have any wallet assigned")
+		responseJSON, _ := json.Marshal(response)
+		w.Write(responseJSON)
 		return
 	}
 
@@ -81,12 +97,16 @@ func sendTransaction(w http.ResponseWriter, req *http.Request) {
 
 	authenticated, err := senderAccount.OTP.Authenticate(transactionForm.OTP)
 	if err != nil && err.Error() != "invalid code" {
-		http.Error(w, "A fatal error occured", http.StatusInternalServerError)
+		response := responses.NewSendTransactionResponse(true, nil, "A fatal error occured")
+		responseJSON, _ := json.Marshal(response)
+		w.Write(responseJSON)
 		log.Panic(err.Error())
 	}
 
 	if !authenticated {
-		http.Error(w, "OTP is wrong", http.StatusBadRequest)
+		response := responses.NewSendTransactionResponse(true, nil, "OTP is wrong")
+		responseJSON, _ := json.Marshal(response)
+		w.Write(responseJSON)
 		return
 	}
 
@@ -95,20 +115,28 @@ func sendTransaction(w http.ResponseWriter, req *http.Request) {
 	transaction.Realise()
 
 	if err := database.InsertTransaction(transaction); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response := responses.NewSendTransactionResponse(true, nil, "A fatal error occured")
+		responseJSON, _ := json.Marshal(response)
+		w.Write(responseJSON)
 		return
 	}
 
 	if err := database.UpdateAccountByInsuranceID(senderAccount.SocialInsuranceID, senderAccount); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response := responses.NewSendTransactionResponse(true, nil, "A fatal error occured")
+		responseJSON, _ := json.Marshal(response)
+		w.Write(responseJSON)
 		return
 	}
 
 	if err := database.UpdateAccountByInsuranceID(recipientAccount.SocialInsuranceID, recipientAccount); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		response := responses.NewSendTransactionResponse(true, nil, "A fatal error occured")
+		responseJSON, _ := json.Marshal(response)
+		w.Write(responseJSON)
 		return
 	}
 
-	http.Error(w, "Success", 200)
+	response := responses.NewSendTransactionResponse(false, &transaction.TransactionHash, "Success")
+	responseJSON, _ := json.Marshal(response)
+	w.Write(responseJSON)
 	return
 }

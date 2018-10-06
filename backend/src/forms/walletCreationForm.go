@@ -1,4 +1,4 @@
-package models
+package forms
 
 // WalletCreationForm struct is required as interface when creating a new wallet via REST
 type WalletCreationForm struct {

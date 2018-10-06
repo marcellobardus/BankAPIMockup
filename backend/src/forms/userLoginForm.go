@@ -1,4 +1,4 @@
-package models
+package forms
 
 type UserLoginForm struct {
 	LoginID      uint32 `bson:"loginid" json:"loginid"`
