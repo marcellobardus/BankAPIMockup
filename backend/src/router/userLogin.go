@@ -65,7 +65,7 @@ func userLogin(w http.ResponseWriter, req *http.Request) {
 
 	// Create new authorization
 
-	authorization := models.NewAuthorization([]string{"/sendTransaction"}, time.Now().Add(config.UserSessionExpirationMinutes), account)
+	authorization := models.NewAuthorization(time.Now().Add(config.UserSessionExpirationMinutes), account)
 
 	err = database.InsertAuthorization(authorization)
 

@@ -4,10 +4,9 @@ import (
 	"crypto/md5"
 	"encoding/base32"
 	"encoding/hex"
+	"github.com/dchest/uniuri"
 	"hash/adler32"
 	"log"
-	"math/rand"
-	"strconv"
 	"time"
 
 	"github.com/dgryski/dgoogauth"
@@ -71,9 +70,8 @@ func (account *Account) GenerateLoginID() {
 }
 
 func (account *Account) SetOPT() {
-	rand.NewSource(time.Now().UnixNano())
-	randomInt := rand.Intn(999999999999-9999) + 9999
-	md5Hash := md5.Sum([]byte(strconv.Itoa(randomInt)))
+	randomString := uniuri.New()
+	md5Hash := md5.Sum([]byte(randomString))
 	md5HashToString := hex.EncodeToString(md5Hash[:])
 	base32EncodedHash := base32.StdEncoding.EncodeToString([]byte(md5HashToString))
 	account.OTP = &dgoogauth.OTPConfig{
